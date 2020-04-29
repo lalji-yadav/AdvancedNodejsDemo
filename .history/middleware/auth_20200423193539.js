@@ -1,0 +1,25 @@
+const jwt = require('jsonwebtoken')
+const taskDemo = require('../models/task')
+
+const auth = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '')
+        const decoded = jwt.verify(token, 'anubhav')
+        const task = await taskDemo.findOne({ _id: decoded._id, 'tokens.token': token})
+       
+        if(!task) {
+        throw new Error()
+        }
+
+        req.token = token
+        req.task = task
+
+      // console.log('fgfrhebhjertb')
+       next()
+        
+    } catch (e) {
+        res.status(401).send({error: 'please authenticate'});
+    }
+}
+
+module.exports = auth
